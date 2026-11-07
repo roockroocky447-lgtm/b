@@ -1,0 +1,1097 @@
+@import "tailwindcss";
+
+/* ================================================================
+   1. TOKENS
+   ================================================================ */
+:root {
+  color-scheme: dark;
+
+  --desk: #14110d;
+  --paper: #f3e9d6;
+  --paper-2: #e8dbc0;
+  --ink: #2a201a;
+  --ink-soft: #6f5e4a;
+  --gold: #c9a227;
+  --gold-soft: #e0c475;
+  --ui-fg: #efe6d5;
+  --ui-dim: #a2947d;
+  --ui-line: rgba(201, 162, 39, 0.3);
+  --oxblood: #5d1f1d;
+
+  --font-body: "Amiri", "Noto Naskh Arabic", "Traditional Arabic", serif;
+  --font-display: "Reem Kufi", "Amiri", serif;
+  --font-ui: "IBM Plex Sans Arabic", "Reem Kufi", system-ui, sans-serif;
+
+  --turn: 950ms;
+  --ease: cubic-bezier(0.32, 0.72, 0.24, 1);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--desk);
+  color: var(--ui-fg);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overscroll-behavior: none;
+}
+
+/* ================================================================
+   2. THE ROOM (desk surface + lamplight)
+   ================================================================ */
+.desk {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: url("./assets/desk.jpg");
+  background-size: cover;
+  background-position: center;
+}
+.desk::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(120% 85% at 50% 34%, rgba(255, 214, 150, 0.16), transparent 62%),
+    radial-gradient(140% 120% at 50% 50%, transparent 34%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+/* ================================================================
+   3. CHROME — header, tray, buttons, toast
+   ================================================================ */
+.shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.7rem clamp(0.85rem, 3vw, 1.75rem);
+  border-bottom: 1px solid rgba(201, 162, 39, 0.16);
+  background: linear-gradient(180deg, rgba(10, 8, 6, 0.82), rgba(10, 8, 6, 0.36));
+  backdrop-filter: blur(7px);
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.brand b {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(15px, 2.4vw, 18px);
+  letter-spacing: 0.02em;
+  color: var(--gold-soft);
+  white-space: nowrap;
+}
+.brand span {
+  font-size: 11.5px;
+  letter-spacing: 0.22em;
+  color: var(--ui-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 12px;
+  color: var(--ui-dim);
+}
+.status .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4a8f5b;
+  box-shadow: 0 0 0 3px rgba(74, 143, 91, 0.18);
+}
+.status .dot.warn {
+  background: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.16);
+}
+.folio-indicator {
+  font-family: var(--font-display);
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--gold-soft);
+  border: 1px solid var(--ui-line);
+  border-radius: 999px;
+  padding: 0.2rem 0.7rem;
+  white-space: nowrap;
+}
+
+.stage-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vh, 1.4rem);
+  padding: clamp(0.75rem, 2.5vh, 1.75rem) 0.75rem;
+  min-height: 0;
+}
+
+.tray {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.6rem clamp(0.6rem, 3vw, 1.5rem) calc(0.7rem + env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(201, 162, 39, 0.18);
+  background: linear-gradient(0deg, rgba(9, 7, 5, 0.92), rgba(9, 7, 5, 0.55));
+  backdrop-filter: blur(7px);
+}
+.tray-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 0 0.25rem;
+  background: rgba(201, 162, 39, 0.2);
+}
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ui-fg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.32));
+  border: 1px solid rgba(201, 162, 39, 0.26);
+  border-radius: 9px;
+  padding: 0.6rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, transform 0.12s ease;
+}
+.btn:hover:not(:disabled) {
+  border-color: rgba(201, 162, 39, 0.72);
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.16), rgba(0, 0, 0, 0.3));
+  color: #fff8e6;
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.btn:disabled {
+  opacity: 0.34;
+  cursor: not-allowed;
+}
+.btn svg {
+  flex: none;
+}
+.btn--gold {
+  background: linear-gradient(180deg, #dcb94c, #a37c19);
+  border-color: #efd98f;
+  color: #241a07;
+  font-weight: 600;
+}
+.btn--gold:hover:not(:disabled) {
+  background: linear-gradient(180deg, #eccb63, #b98d1e);
+  color: #1b1305;
+}
+.btn--ghost {
+  background: transparent;
+}
+.btn.is-on {
+  background: linear-gradient(180deg, rgba(201, 162, 39, 0.32), rgba(201, 162, 39, 0.1));
+  border-color: var(--gold);
+  color: #ffe9ad;
+}
+.btn--danger:hover:not(:disabled) {
+  border-color: #b4574a;
+  background: linear-gradient(180deg, rgba(180, 87, 74, 0.22), rgba(0, 0, 0, 0.3));
+  color: #f3bfb4;
+}
+.btn--nav {
+  min-width: 116px;
+  justify-content: center;
+  font-size: 13.5px;
+}
+
+.hint {
+  font-size: 12px;
+  color: var(--ui-dim);
+  text-align: center;
+  letter-spacing: 0.03em;
+  max-width: min(92vw, 640px);
+}
+.hint em {
+  font-style: normal;
+  color: var(--gold-soft);
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 104px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 13px;
+  color: #1d1509;
+  background: linear-gradient(180deg, #e6c96f, #c2a03a);
+  border: 1px solid #f3e3ab;
+  border-radius: 999px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  animation: toastIn 0.32s var(--ease) both;
+  pointer-events: none;
+  max-width: 90vw;
+  text-align: center;
+}
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ================================================================
+   4. THE BOOK — geometry, leaves, faces
+   ================================================================ */
+.book-stage {
+  --page-w-ratio: 1.5; /* width / height of the whole spread */
+  --book-w: min(1160px, 92vw);
+  --book-h: min(74vh, 720px);
+  --book-w: min(calc(var(--book-h) * var(--page-w-ratio)), 92vw);
+  --book-h: min(var(--book-h), calc(var(--book-w) / var(--page-w-ratio)));
+  --page-fs: clamp(14px, calc(var(--book-w) * 0.0163), 19px);
+  --pad-out: clamp(15px, 5.4%, 44px);
+  --pad-gut: clamp(19px, 8.6%, 64px);
+  --pad-top: clamp(16px, 5.6%, 42px);
+  --pad-bot: clamp(13px, 4.6%, 34px);
+
+  position: relative;
+  width: var(--book-w);
+  height: var(--book-h);
+  perspective: 2600px;
+  perspective-origin: 50% 44%;
+  flex: none;
+}
+.book-stage--single {
+  --page-w-ratio: 0.66;
+  --book-w: min(430px, 84vw);
+  --book-h: min(70vh, 640px);
+  --book-w: min(calc(var(--book-h) * var(--page-w-ratio)), 84vw, 430px);
+  --book-h: min(var(--book-h), calc(var(--book-w) / var(--page-w-ratio)));
+  --page-fs: clamp(16px, calc(var(--book-w) * 0.0505), 21px);
+}
+
+.book {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 900ms var(--ease);
+}
+/* closed book: the cover (left half) slides to the centre of the desk */
+.book.is-closed {
+  transform: translateX(25%);
+}
+
+.book-shadow {
+  position: absolute;
+  left: -4%;
+  right: -4%;
+  bottom: -3.4%;
+  height: 9%;
+  z-index: -90;
+  background: radial-gradient(50% 50% at 50% 50%, rgba(0, 0, 0, 0.72), transparent 72%);
+  filter: blur(2px);
+  transition: opacity 900ms var(--ease);
+}
+.book.is-closed .book-shadow {
+  left: -14%;
+  right: 36%;
+}
+
+/* the spine crease that runs down the middle of the spread */
+.book-crease {
+  position: absolute;
+  top: -1.5%;
+  bottom: -1.5%;
+  left: 50%;
+  width: 42px;
+  margin-left: -21px;
+  z-index: 40;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(20, 14, 8, 0) 0%,
+    rgba(20, 14, 8, 0.3) 38%,
+    rgba(10, 7, 4, 0.66) 50%,
+    rgba(20, 14, 8, 0.3) 62%,
+    rgba(20, 14, 8, 0) 100%
+  );
+  transition: opacity 700ms var(--ease);
+}
+.book.is-closed .book-crease {
+  width: 26px;
+  margin-left: -13px;
+  opacity: 0.85;
+}
+
+/* stacked page edges peeking out from under the block of pages */
+.edges {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  width: 8px;
+  z-index: -70;
+  border-radius: 3px;
+  background: linear-gradient(90deg, #b9a888 0%, #efe4cd 45%, #d8caac 100%);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.28);
+  transition: opacity 700ms var(--ease);
+}
+.edges--l {
+  left: -7px;
+}
+.edges--r {
+  right: -7px;
+  transform: scaleX(-1);
+}
+
+.leaf {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform-origin: right center;
+  transition: transform var(--turn) var(--ease), z-index 0s;
+  box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+}
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background-color: var(--paper);
+  background-image: url("./assets/paper.jpg");
+  background-size: cover;
+  background-position: center;
+}
+.face--back {
+  transform: rotateY(180deg);
+}
+.face::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 13%;
+  z-index: 4;
+  pointer-events: none;
+}
+.face--front::after {
+  right: 0;
+  background: linear-gradient(90deg, rgba(46, 33, 21, 0) 0%, rgba(46, 33, 21, 0.26) 100%);
+}
+.face--back::after {
+  left: 0;
+  background: linear-gradient(270deg, rgba(46, 33, 21, 0) 0%, rgba(46, 33, 21, 0.26) 100%);
+}
+/* outer edge light falloff */
+.face::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(110% 90% at 30% 12%, rgba(255, 246, 224, 0.5), rgba(255, 246, 224, 0) 58%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.09));
+}
+.face--cover::before {
+  background: radial-gradient(120% 90% at 26% 10%, rgba(255, 226, 176, 0.3), transparent 62%),
+    linear-gradient(200deg, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.58));
+}
+
+/* ================================================================
+   5. PAGE CONTENT
+   ================================================================ */
+.page {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  padding-top: var(--pad-top);
+  padding-bottom: var(--pad-bot);
+}
+.face--front .page {
+  padding-right: var(--pad-gut);
+  padding-left: var(--pad-out);
+}
+.face--back .page {
+  padding-left: var(--pad-gut);
+  padding-right: var(--pad-out);
+}
+.page-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(111, 94, 74, 0.4) transparent;
+}
+.page-scroll::-webkit-scrollbar {
+  width: 5px;
+}
+.page-scroll::-webkit-scrollbar-thumb {
+  background: rgba(111, 94, 74, 0.4);
+  border-radius: 9px;
+}
+.page-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.running-head {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: var(--font-display);
+  font-size: clamp(9px, calc(var(--book-w) * 0.0092), 12px);
+  letter-spacing: 0.34em;
+  color: var(--ink-soft);
+  padding-bottom: 0.62rem;
+  border-bottom: 1px solid rgba(111, 94, 74, 0.42);
+  margin-bottom: clamp(0.7rem, 2.4vh, 1.5rem);
+  text-transform: uppercase;
+}
+.running-head::after {
+  content: "";
+  height: 2px;
+  flex: 1;
+  background: linear-gradient(90deg, rgba(201, 162, 39, 0.75), transparent);
+}
+
+.story {
+  font-family: var(--font-body);
+  font-size: var(--page-fs);
+  line-height: 2.06;
+  color: var(--ink);
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: none;
+  word-spacing: 0.01em;
+}
+.story p {
+  margin: 0 0 0.85em;
+}
+.story p.indent {
+  text-indent: 1.5em;
+}
+.story p:last-child {
+  margin-bottom: 0;
+}
+.drop {
+  color: var(--oxblood);
+  font-weight: 700;
+}
+
+.folio {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  margin-top: clamp(0.6rem, 2vh, 1.2rem);
+  font-family: var(--font-display);
+  font-size: clamp(10px, calc(var(--book-w) * 0.011), 13px);
+  color: var(--ink-soft);
+  letter-spacing: 0.05em;
+}
+.folio::before,
+.folio::after {
+  content: "";
+  height: 1px;
+  width: clamp(18px, 8%, 54px);
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.85));
+}
+.folio::after {
+  background: linear-gradient(270deg, transparent, rgba(201, 162, 39, 0.85));
+}
+
+/* --- cover ------------------------------------------------------------ */
+.pg--cover {
+  background-color: #4a1715;
+  background-image: url("./assets/cover.jpg");
+  background-size: cover;
+  background-position: center;
+}
+.cover-frame {
+  position: absolute;
+  inset: clamp(12px, 5.5%, 34px);
+  border: 1px solid rgba(224, 196, 117, 0.55);
+  outline: 1px solid rgba(224, 196, 117, 0.22);
+  outline-offset: 5px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: clamp(14px, 6%, 40px);
+  gap: clamp(6px, 1.6vh, 16px);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.55);
+}
+.cover-kicker {
+  font-family: var(--font-display);
+  font-size: clamp(9px, calc(var(--book-w) * 0.011), 13px);
+  letter-spacing: 0.5em;
+  color: rgba(238, 214, 152, 0.78);
+  padding-right: 0.5em;
+}
+.cover-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(26px, calc(var(--book-w) * 0.052), 62px);
+  line-height: 1.35;
+  color: #f0d999;
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.55), 0 0 26px rgba(0, 0, 0, 0.4);
+}
+.cover-rule {
+  width: clamp(48px, 40%, 150px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(240, 217, 153, 0.9), transparent);
+}
+.cover-author {
+  font-family: var(--font-body);
+  font-size: clamp(14px, calc(var(--book-w) * 0.021), 24px);
+  color: rgba(245, 227, 187, 0.9);
+}
+.cover-open {
+  position: absolute;
+  bottom: clamp(16px, 7%, 40px);
+  left: 0;
+  right: 0;
+  z-index: 3;
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: clamp(10px, calc(var(--book-w) * 0.0125), 13px);
+  letter-spacing: 0.16em;
+  color: rgba(255, 236, 196, 0.78);
+  animation: breathe 2.6s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* --- title / dedication / ornament ------------------------------------ */
+.pg--title .cover-title {
+  color: var(--ink);
+  text-shadow: none;
+}
+.center-page {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: clamp(8px, 1.8vh, 18px);
+  padding: clamp(16px, 7%, 44px);
+}
+.small-cap {
+  font-family: var(--font-display);
+  font-size: clamp(9px, calc(var(--book-w) * 0.0115), 13px);
+  letter-spacing: 0.42em;
+  color: var(--ink-soft);
+  padding-right: 0.42em;
+}
+.big-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: clamp(24px, calc(var(--book-w) * 0.046), 54px);
+  line-height: 1.4;
+  color: var(--ink);
+}
+.by-line {
+  font-family: var(--font-body);
+  font-size: clamp(15px, calc(var(--book-w) * 0.023), 26px);
+  color: var(--oxblood);
+}
+.gold-rule {
+  width: clamp(60px, 46%, 190px);
+  height: 3px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, 0.95) 20%, rgba(201, 162, 39, 0.95) 80%, transparent);
+  position: relative;
+}
+.gold-rule::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  margin: -4.5px 0 0 -4.5px;
+  transform: rotate(45deg);
+  background: var(--gold);
+}
+.note {
+  font-family: var(--font-body);
+  font-size: clamp(14px, calc(var(--book-w) * 0.0195), 22px);
+  line-height: 1.95;
+  color: var(--ink);
+  white-space: pre-line;
+}
+.dedic {
+  position: absolute;
+  left: clamp(16px, 8%, 52px);
+  right: clamp(16px, 8%, 52px);
+  bottom: clamp(40px, 20%, 130px);
+  text-align: center;
+}
+.ornament {
+  font-family: var(--font-display);
+  font-size: clamp(30px, calc(var(--book-w) * 0.05), 60px);
+  color: var(--gold);
+  line-height: 1;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.pg--endpaper {
+  background-image: url("./assets/endpaper.jpg");
+  background-size: cover;
+  background-position: center;
+}
+.plaque {
+  background: rgba(243, 233, 214, 0.93);
+  border: 1px solid rgba(201, 162, 39, 0.7);
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.4);
+  padding: clamp(14px, 7%, 34px) clamp(16px, 9%, 40px);
+  max-width: 92%;
+}
+
+/* ================================================================
+   6. EDITING
+   ================================================================ */
+.ed {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  background: rgba(250, 245, 235, 0.74);
+  outline: 2px dashed rgba(201, 162, 39, 0.85);
+  outline-offset: -8px;
+}
+.ed-in,
+.ed-area {
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: rgba(255, 253, 248, 0.72);
+  border: 1px solid rgba(111, 94, 74, 0.45);
+  border-radius: 5px;
+  padding: 0.45rem 0.7rem;
+  width: 100%;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+.ed-in:focus,
+.ed-area:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201, 162, 39, 0.28);
+}
+.ed-in {
+  font-size: clamp(15px, calc(var(--book-w) * 0.026), 30px);
+  text-align: center;
+}
+.ed-area {
+  flex: 1;
+  min-height: 0;
+  resize: none;
+  font-size: var(--page-fs);
+  line-height: 1.95;
+  text-align: justify;
+}
+.ed-label {
+  font-family: var(--font-ui);
+  font-size: 10.5px;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  margin-bottom: 0.3rem;
+  display: block;
+}
+.ed-scroll {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  overflow-y: auto;
+}
+.pg-del {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 9;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(35, 16, 13, 0.9);
+  color: #f0b6a9;
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  transition: 0.18s;
+}
+.pg-del:hover {
+  background: #8c2f24;
+  color: #fff;
+  transform: scale(1.08);
+}
+.edit-badge {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 8;
+  font-family: var(--font-ui);
+  font-size: 9.5px;
+  letter-spacing: 0.14em;
+  color: rgba(111, 94, 74, 0.85);
+  background: rgba(255, 253, 248, 0.8);
+  border: 1px solid rgba(201, 162, 39, 0.5);
+  border-radius: 999px;
+  padding: 0.12rem 0.5rem;
+  pointer-events: none;
+}
+
+/* click zones for turning pages */
+.zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 14%;
+  z-index: 45;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  transition: background 0.25s ease;
+}
+.zone:hover {
+  background: linear-gradient(0deg, rgba(255, 236, 190, 0.05), rgba(255, 236, 190, 0.14));
+}
+.zone--next {
+  left: 0;
+}
+.zone--prev {
+  right: 0;
+}
+.zone:disabled {
+  cursor: default;
+  background: none;
+}
+
+/* ================================================================
+   7. SINGLE-PAGE (small screens) FLIP
+   ================================================================ */
+.single {
+  position: absolute;
+  inset: 0;
+  transform-origin: right center;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  backface-visibility: hidden;
+}
+.single.is-entering {
+  animation: pageIn 380ms var(--ease) both;
+}
+.single.is-leaving {
+  animation: pageOutF 620ms var(--ease) both;
+  pointer-events: none;
+}
+.single.is-leaving.back {
+  transform-origin: left center;
+  animation-name: pageOutB;
+}
+@keyframes pageIn {
+  from {
+    opacity: 0.35;
+    transform: translateX(-3%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+@keyframes pageOutF {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: rotateY(96deg);
+    opacity: 0;
+  }
+}
+@keyframes pageOutB {
+  0% {
+    transform: rotateY(0deg);
+    opacity: 1;
+  }
+  70% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: rotateY(-96deg);
+    opacity: 0;
+  }
+}
+
+/* ================================================================
+   8. RESPONSIVE
+   ================================================================ */
+@media (max-width: 700px) {
+  .topbar {
+    padding-top: 0.55rem;
+    padding-bottom: 0.55rem;
+  }
+  .brand span {
+    display: none;
+  }
+  .btn {
+    font-size: 12.5px;
+    padding: 0.55rem 0.7rem;
+  }
+  .btn--nav {
+    min-width: 104px;
+  }
+  .tray {
+    gap: 0.38rem;
+  }
+  .tray-sep {
+    display: none;
+  }
+  .hint {
+    display: none;
+  }
+  .toast {
+    bottom: 92px;
+    font-size: 12.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --turn: 1ms;
+  }
+  .book,
+  .leaf,
+  .single,
+  .edges,
+  .book-crease,
+  .book-shadow {
+    transition-duration: 1ms !important;
+  }
+  .single.is-entering,
+  .single.is-leaving,
+  .cover-open,
+  .toast {
+    animation-duration: 1ms !important;
+  }
+}
+
+/* ================================================================
+   9. تصحيحات نهائية
+   ================================================================ */
+
+/* 9.1 — مقاس الكتاب: بدون مراجع ذاتية للخصائص المتغيّرة
+        (المرجع الذاتي يجعل القيمة غير صالحة وقد يُفرغ الكتاب) */
+.book-stage {
+  --bh: min(70vh, 700px);
+  --bw: min(calc(var(--bh) * 1.5), 92vw);
+  --book-w: var(--bw);
+  --book-h: min(var(--bh), calc(var(--bw) / 1.5));
+  --page-fs: clamp(14px, calc(var(--book-w) * 0.0163), 19px);
+}
+.book-stage--single {
+  --bh: min(66vh, 620px);
+  --bw: min(430px, 84vw, calc(var(--bh) * 0.66));
+  --book-w: var(--bw);
+  --book-h: min(var(--bh), calc(var(--bw) / 0.66));
+  --page-fs: clamp(16px, calc(var(--book-w) * 0.052), 21px);
+}
+
+/* 9.2 — طبقات الورقة: التظليل تحت النص لا فوقه */
+.face::before,
+.face::after {
+  z-index: 1;
+}
+
+/* 9.3 — الخط العربي متّصل: لا تباعد بين الحروف، بل بين الكلمات */
+.brand b,
+.brand span,
+.status,
+.folio-indicator,
+.hint,
+.cover-kicker,
+.cover-open,
+.running-head,
+.small-cap,
+.ed-label,
+.edit-badge,
+.btn,
+.toast,
+.big-title,
+.cover-title {
+  letter-spacing: 0;
+}
+.brand span,
+.cover-kicker,
+.running-head,
+.small-cap {
+  word-spacing: 0.34em;
+}
+
+/* 9.4 — نقاط ومؤشّرات */
+.status .dot {
+  display: inline-block;
+  flex: none;
+}
+
+/* 9.5 — الغلاف الخلفي حين تنقلب كل الأوراق */
+.back-cover {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  z-index: -50;
+  background-color: #4a1715;
+  background-image: url("./assets/cover.jpg");
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.34);
+}
+
+/* 9.6 — مناطق التقليب: فوق الورقة المتطايرة كي تبقى النقرات فعّالة */
+.zone {
+  z-index: 1000;
+}
+.zone--open {
+  left: 0;
+}
+.zone:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: -5px;
+  background: rgba(201, 162, 39, 0.14);
+}
+.pg-del:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* 9.7 — قصّ محتوى الورقة المفردة */
+.single {
+  overflow: hidden;
+}
+
+/* 9.8 — لا ينقطع الكلم العربي إذا طال */
+.story {
+  overflow-wrap: break-word;
+}
+::selection {
+  background: rgba(201, 162, 39, 0.32);
+  color: var(--ink);
+}
+
+/* 9.9 — وشاح القماش المعلّق من أعلى الكعب */
+.book::before {
+  content: "";
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  width: 15px;
+  height: 44%;
+  margin-left: -7.5px;
+  z-index: 45;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 550ms ease 300ms;
+  background: linear-gradient(90deg, #5f1412 0%, #a5322a 42%, #7a1a17 100%);
+  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.45);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%);
+}
+.book.is-closed::before {
+  opacity: 0;
+}
+
+/* 9.10 — رَوشان الزخرفي في ترويسة الصفحات السردية */
+.running-head::before {
+  content: "۞";
+  font-family: var(--font-body);
+  font-size: 1.5em;
+  line-height: 1;
+  color: var(--gold);
+  flex: none;
+}
+
+/* 9.11 — حجم عنوان الحقل على الشاشات الصغيرة (يمنع تقريب المتصفح) */
+.ed-in {
+  font-size: clamp(16px, calc(var(--book-w) * 0.026), 30px);
+}
+
+/* 9.12 — أرضية لعرض الورقة: ألّا يصغر العرض عن أن يُقرأ
+        (على الشاشات الأفقية القصيرة كان العرض سيهبط إلى ١٧٠ بكسل) */
+.book-stage--single {
+  --bw: min(430px, 84vw, max(calc(var(--bh) * 0.66), 260px));
+  --book-h: min(var(--bh), calc(var(--bw) / 0.66));
+}
+
+/* 9.13 — الشاشات القصيرة: شريط أدوات واحد قابل للتمرير أفقيًا */
+@media (max-height: 580px) and (max-width: 940px) {
+  .tray {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-top: 0.45rem;
+    padding-bottom: calc(0.5rem + env(safe-area-inset-bottom));
+  }
+  .stage-wrap {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
